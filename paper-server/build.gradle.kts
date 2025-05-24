@@ -207,15 +207,15 @@ tasks.jar {
         attributes(
             "Main-Class" to "org.bukkit.craftbukkit.Main",
             "Implementation-Title" to "Paper",
-            "Implementation-Version" to implementationVersion,
-            "Implementation-Vendor" to date,
+            "Implementation-Version" to "1970-01-01 00:00:00 +0100",
+            "Implementation-Vendor" to "1970-01-01 00:00:00 +0100",
             "Specification-Title" to "Paper",
             "Specification-Version" to project.version,
             "Specification-Vendor" to "Paper Team",
             "Brand-Id" to "papermc:paper",
             "Brand-Name" to "Paper",
             "Build-Number" to (build ?: ""),
-            "Build-Time" to buildTime.toString(),
+            "Build-Time" to "1970-01-01T00:00:00.010000Z",
             "Git-Branch" to gitBranch,
             "Git-Commit" to gitHash,
         )
