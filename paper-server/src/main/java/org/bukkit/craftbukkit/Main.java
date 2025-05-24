@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,6 +17,9 @@ public class Main {
     public static final java.time.Instant BOOT_TIME = java.time.Instant.now(); // Paper - track initial start time
     public static boolean useJline = true;
     public static boolean useConsole = true;
+    public static Date buildDate;
+    public static Calendar deadline;
+    public static boolean printedWarning = false;
 
     // Paper start - Reset loggers after shutdown
     static {
@@ -222,6 +227,16 @@ public class Main {
                     System.setProperty(net.minecrell.terminalconsole.TerminalConsoleAppender.JLINE_OVERRIDE_PROPERTY, "false"); // Paper
                 }
 
+                if (Main.class.getPackage().getImplementationVendor() != null && System.getProperty("IReallyKnowWhatIAmDoingISwear") == null) {
+                    buildDate = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z").parse(Main.class.getPackage().getImplementationVendor());
+                    deadline = Calendar.getInstance();
+                    deadline.add(Calendar.DAY_OF_YEAR, -14);
+                        if (buildDate.before(deadline.getTime())) {
+                            System.err.println("*** Warning, you've not updated in a while! ***");
+                            System.err.println("*** Check further logs for more details ***");
+                            printedWarning = true;
+                    }
+                }
 
                 System.setProperty("library.jansi.version", "Paper"); // Paper - set meaningless jansi version to prevent git builds from crashing on Windows
                 System.setProperty("jdk.console", "java.base"); // Paper - revert default console provider back to java.base so we can have our own jline
