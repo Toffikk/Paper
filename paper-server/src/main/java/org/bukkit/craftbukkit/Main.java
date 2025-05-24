@@ -2,16 +2,19 @@ package org.bukkit.craftbukkit;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.util.PathConverter;
+import io.papermc.paper.ServerBuildInfo;
+import com.destroystokyo.paper.PaperVersionFetcher;
+import java.text.SimpleDateFormat;
+import java.util.Optional;
+import java.util.OptionalInt;
+import net.minecraft.SharedConstants;
 
 public class Main {
     public static final java.time.Instant BOOT_TIME = java.time.Instant.now(); // Paper - track initial start time
@@ -224,26 +227,54 @@ public class Main {
                     System.setProperty(net.minecrell.terminalconsole.TerminalConsoleAppender.JLINE_OVERRIDE_PROPERTY, "false"); // Paper
                 }
 
-                if (Main.class.getPackage().getImplementationVendor() != null && System.getProperty("IReallyKnowWhatIAmDoingISwear") == null) {
-                    Date buildDate = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z").parse(Main.class.getPackage().getImplementationVendor()); // Paper
-
-                    Calendar deadline = Calendar.getInstance();
-                    deadline.add(Calendar.DAY_OF_YEAR, -14);
-                    if (buildDate.before(deadline.getTime())) {
-                        // Paper start - This is some stupid bullshit
-                        System.err.println("*** Warning, you've not updated in a while! ***");
-                        System.err.println("*** Please download a new build from https://papermc.io/downloads/paper ***");
-                        // Paper end
-                    }
-                }
 
                 System.setProperty("library.jansi.version", "Paper"); // Paper - set meaningless jansi version to prevent git builds from crashing on Windows
                 System.setProperty("jdk.console", "java.base"); // Paper - revert default console provider back to java.base so we can have our own jline
 
+                SharedConstants.tryDetectVersion();
+                new io.papermc.paper.ServerBuildInfoImpl();
+                if (System.getProperty("IReallyKnowWhatIAmDoingISwear") == null) {
+                    final ServerBuildInfo build = ServerBuildInfo.buildInfo();
+                    final OptionalInt buildNumber = build.buildNumber();
+                    final String repo = "PaperMC/Paper";
+                    int distance = PaperVersionFetcher.DISTANCE_ERROR;
+
+                    if (build.buildNumber().isEmpty() && build.gitCommit().isEmpty()) {
+                        System.out.println("*** You are running a development version without access to version information ***");
+                    } else {
+                        if (buildNumber.isPresent()) {
+                            distance = PaperVersionFetcher.fetchDistanceFromSiteApi(build, buildNumber.getAsInt());
+                        } else {
+                            final Optional<String> gitBranch = build.gitBranch();
+                            final Optional<String> gitCommit = build.gitCommit();
+                            if (gitBranch.isPresent() && gitCommit.isPresent()) {
+                                distance = PaperVersionFetcher.fetchDistanceFromGitHub(repo, gitBranch.get(), gitCommit.get());
+                                }
+                            }
+
+                        switch (distance) {
+                            case PaperVersionFetcher.DISTANCE_ERROR -> System.err.println("*** Error obtaining version information! Can't fetch version info ***");
+                            case 0 -> {}
+                            case PaperVersionFetcher.DISTANCE_UNKNOWN -> System.out.println("*** You are running an unknown version! Can't fetch version info ***");
+                            default -> {
+                                if (distance > 5) {
+                                    System.err.println("*** Warning, you've not updated in a while! ***");
+                                    System.err.println("*** You are " + distance + " builds behind!");
+                                    System.err.println("*** Please download a new build from https://papermc.io/downloads/paper ***");
+                                } else {
+                                    System.out.println("*** There's a new build available to download ***");
+                                    System.out.println("*** Currently you are " + distance + " builds behind");
+                                    System.out.println("*** You can download a new build from https://papermc.io/downloads/paper ***");
+                                }
+                        }
+                    };
+                }
+            }
                 io.papermc.paper.PaperBootstrap.boot(options);
             } catch (Throwable t) {
                 t.printStackTrace();
             }
+            
         }
     }
 
