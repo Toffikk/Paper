@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -224,18 +222,6 @@ public class Main {
                     System.setProperty(net.minecrell.terminalconsole.TerminalConsoleAppender.JLINE_OVERRIDE_PROPERTY, "false"); // Paper
                 }
 
-                if (Main.class.getPackage().getImplementationVendor() != null && System.getProperty("IReallyKnowWhatIAmDoingISwear") == null) {
-                    Date buildDate = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z").parse(Main.class.getPackage().getImplementationVendor()); // Paper
-
-                    Calendar deadline = Calendar.getInstance();
-                    deadline.add(Calendar.DAY_OF_YEAR, -14);
-                    if (buildDate.before(deadline.getTime())) {
-                        // Paper start - This is some stupid bullshit
-                        System.err.println("*** Warning, you've not updated in a while! ***");
-                        System.err.println("*** Please download a new build from https://papermc.io/downloads/paper ***");
-                        // Paper end
-                    }
-                }
 
                 System.setProperty("library.jansi.version", "Paper"); // Paper - set meaningless jansi version to prevent git builds from crashing on Windows
                 System.setProperty("jdk.console", "java.base"); // Paper - revert default console provider back to java.base so we can have our own jline

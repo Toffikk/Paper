@@ -1,0 +1,92 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Toffikk <slodkitofik@gmail.com>
+Date: Sat, 24 May 2025 23:51:30 +0200
+Subject: [PATCH] Improve the outdated version check
+
+
+diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
+index f1373fd5fdebb9f4600ba7f32a5df6188de3a0e9..2f6366774ff5e8926ed0e806e1ee789f80a475de 100644
+--- a/net/minecraft/server/MinecraftServer.java
++++ b/net/minecraft/server/MinecraftServer.java
+@@ -36,6 +36,7 @@ import java.util.Locale;
+ import java.util.Map;
+ import java.util.Objects;
+ import java.util.Optional;
++import java.util.OptionalInt;
+ import java.util.Set;
+ import java.util.UUID;
+ import java.util.Map.Entry;
+@@ -48,6 +49,9 @@ import java.util.function.BooleanSupplier;
+ import java.util.function.Consumer;
+ import java.util.function.Function;
+ import java.util.stream.Collectors;
++import java.util.Calendar;
++import java.util.Date;
++import java.text.SimpleDateFormat;
+ import javax.annotation.Nullable;
+ import javax.imageio.ImageIO;
+ import net.minecraft.CrashReport;
+@@ -170,6 +174,8 @@ import net.minecraft.world.level.storage.ServerLevelData;
+ import net.minecraft.world.level.storage.WorldData;
+ import net.minecraft.world.phys.Vec2;
+ import net.minecraft.world.phys.Vec3;
++import com.destroystokyo.paper.PaperVersionFetcher;
++import io.papermc.paper.ServerBuildInfo;
+ import org.slf4j.Logger;
+ 
+ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTask> implements ServerInfo, ChunkIOErrorReporter, CommandSource, ca.spottedleaf.moonrise.patches.chunk_system.server.ChunkSystemMinecraftServer { // Paper - rewrite chunk system
+@@ -1184,6 +1190,54 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+             // Paper start - further improve server tick loop
+             long tickSection = Util.getNanos();
+             long currentTime;
++            CompletableFuture.runAsync(() -> {
++                try {
++                if (Main.class.getPackage().getImplementationVendor() != null && System.getProperty("IReallyKnowWhatIAmDoingISwear") == null) {
++                    Date buildDate = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z").parse(Main.class.getPackage().getImplementationVendor());
++                    Calendar deadline = Calendar.getInstance();
++                    deadline.add(Calendar.DAY_OF_YEAR, -14);
++
++                    if (buildDate.before(deadline.getTime())) {
++                        final ServerBuildInfo build = ServerBuildInfo.buildInfo();
++                        final OptionalInt buildNumber = build.buildNumber();
++                        final String repo = "PaperMC/Paper";
++                        int distance = PaperVersionFetcher.DISTANCE_ERROR;
++
++                        if (build.buildNumber().isEmpty() && build.gitCommit().isEmpty()) {
++                            LOGGER.info("*** You are running a development version without access to version information ***");
++                        } else {
++                            if (buildNumber.isPresent()) {
++                                distance = PaperVersionFetcher.fetchDistanceFromSiteApi(build, buildNumber.getAsInt());
++                            } else {
++                                final Optional<String> gitBranch = build.gitBranch();
++                                final Optional<String> gitCommit = build.gitCommit();
++                                if (gitBranch.isPresent() && gitCommit.isPresent()) {
++                                    distance = PaperVersionFetcher.fetchDistanceFromGitHub(repo, gitBranch.get(), gitCommit.get());
++                                    }
++                                }
++
++                            switch (distance) {
++                                case PaperVersionFetcher.DISTANCE_ERROR -> LOGGER.error("*** Error obtaining version information! Can't fetch version info ***");
++                                case 0 -> {}
++                                case PaperVersionFetcher.DISTANCE_UNKNOWN -> LOGGER.info("*** You are running an unknown version! Can't fetch version info ***");
++                                case 5 -> {
++                                    LOGGER.error("*** Warning, you've not updated in a while! ***");
++                                    LOGGER.error("*** You are " + distance + " builds behind!");
++                                    LOGGER.error("*** Please download a new build from https://papermc.io/downloads/paper ***");
++                                }
++                                default -> {
++                                    LOGGER.info("*** There's a new build available to download ***");
++                                    LOGGER.info("*** Currently you are " + distance + " builds behind");
++                                    LOGGER.info("*** You can download a new build from https://papermc.io/downloads/paper ***");
++                                }
++                            }
++                        };
++                    }
++                }
++            } catch (Throwable t) {
++                t.printStackTrace();
++            }
++        });
+             // Paper end - further improve server tick loop
+             // Paper start - Add onboarding message for initial server start
+             if (io.papermc.paper.configuration.GlobalConfiguration.isFirstStart) {
