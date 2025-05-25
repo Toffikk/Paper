@@ -193,7 +193,7 @@ public class PaperVersionFetcher implements VersionFetcher {
         }
     }
 
-    // Contributed by Techcable <Techcable@outlook.com> in GH-65
+    // Contributed by Techcable <Techcable@outlook.com> in GH-65 // test comment for commit
     private static int fetchDistanceFromGitHub(final String repo, final String branch, final String hash) {
         try {
             final HttpURLConnection connection = (HttpURLConnection) URI.create("https://api.github.com/repos/%s/compare/%s...%s".formatted(repo, branch, hash)).toURL().openConnection();
