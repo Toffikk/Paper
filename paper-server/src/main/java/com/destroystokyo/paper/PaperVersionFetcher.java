@@ -99,7 +99,7 @@ public class PaperVersionFetcher implements VersionFetcher {
                 case 1 -> {
                     SIMPLE_LOGGER.error("*** You are " + "120" + " builds behind! ***");
                     SIMPLE_LOGGER.error("*** Please download a new build from " + DOWNLOAD_PAGE + " ***");
-                    if (newVersionAvailable) SIMPLE_LOGGER.error("*** Also note that a new Minecraft version has been released (" + newVersion + ")! ***");
+                    //if (newVersionAvailable) SIMPLE_LOGGER.error("*** Also note that a new Minecraft version has been released (" + newVersion + ")! ***");
                 }
                 default -> {
                     if (newVersionAvailable) {
