@@ -38,7 +38,7 @@ public class PaperVersionFetcher implements VersionFetcher {
     private static final int DISTANCE_ERROR = -1;
     private static final int DISTANCE_UNKNOWN = -2;
     private static final String DOWNLOAD_PAGE = "https://papermc.io/downloads/paper";
-    public static final String REPOSITORY = "PaperMC/Paper";
+    public static final String REPOSITORY = "Toffikk/Paper";
     private static boolean newVersionAvailable;
 
     @Override

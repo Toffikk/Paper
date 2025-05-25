@@ -208,7 +208,7 @@ tasks.jar {
             "Main-Class" to "org.bukkit.craftbukkit.Main",
             "Implementation-Title" to "Paper",
             "Implementation-Version" to implementationVersion,
-            "Implementation-Vendor" to date,
+            "Implementation-Vendor" to "2025-01-01 00:00:00 +0100",
             "Specification-Title" to "Paper",
             "Specification-Version" to project.version,
             "Specification-Vendor" to "Paper Team",
