@@ -43,8 +43,10 @@ public class PaperVersionFetcher implements VersionFetcher {
     private static final int DISTANCE_UNKNOWN = -2;
     private static final String DOWNLOAD_PAGE = "https://papermc.io/downloads/paper";
     public static final String REPOSITORY = "PaperMC/Paper";
+    private static final String USER_AGENT = build.brandName() + "/" + build.asString(VERSION_SIMPLE) + " (https://papermc.io)";
+    private static final ServerBuildInfo build = ServerBuildInfo.buildInfo();
     private static boolean newVersionAvailable;
-
+    
     @Override
     public long getCacheTime() {
         return 720000;
@@ -53,7 +55,6 @@ public class PaperVersionFetcher implements VersionFetcher {
     @Override
     public Component getVersionMessage() {
         final Component updateMessage;
-        final ServerBuildInfo build = ServerBuildInfo.buildInfo();
         if (build.buildNumber().isEmpty() && build.gitCommit().isEmpty()) {
             updateMessage = text("You are running a development version without access to version information", color(0xFF5300));
         } else {
@@ -139,12 +140,11 @@ public class PaperVersionFetcher implements VersionFetcher {
 
     private static @Nullable String fetchMinecraftVersionList(final ServerBuildInfo build) {
         final String currentVersion = build.minecraftVersionId();
-        final String userAgent = build.brandName() + "/" + build.asString(VERSION_SIMPLE) + " (https://papermc.io/)";
 
         try {
             final URL versionsUrl = URI.create("https://fill.papermc.io/v3/projects/paper").toURL();
             final HttpURLConnection connection = (HttpURLConnection) versionsUrl.openConnection();
-            connection.setRequestProperty("User-Agent", userAgent);
+            connection.setRequestProperty("User-Agent", USER_AGENT);
             connection.setRequestProperty("Accept", "application/json");
 
             try (final BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
@@ -167,7 +167,7 @@ public class PaperVersionFetcher implements VersionFetcher {
                     try {
                         final URL buildsUrl = URI.create("https://fill.papermc.io/v3/projects/paper/versions/" + latestVersion + "/builds/latest").toURL();
                         final HttpURLConnection connection2 = (HttpURLConnection) buildsUrl.openConnection();
-                        connection2.setRequestProperty("User-Agent", userAgent);
+                        connection2.setRequestProperty("User-Agent", USER_AGENT);
                         connection2.setRequestProperty("Accept", "application/json");
 
                         try (final BufferedReader buildReader = new BufferedReader(new InputStreamReader(connection2.getInputStream(), StandardCharsets.UTF_8))) {
@@ -195,12 +195,11 @@ public class PaperVersionFetcher implements VersionFetcher {
     }
 
     private static int fetchDistanceFromSiteApi(final ServerBuildInfo build, final int jenkinsBuild) {
-        final String userAgent = build.brandName() + "/" + build.asString(VERSION_SIMPLE) + " (https://papermc.io/)";
 
         try {
             final URL buildsUrl = URI.create("https://fill.papermc.io/v3/projects/paper/versions/" + build.minecraftVersionId()).toURL();
             final HttpURLConnection connection = (HttpURLConnection) buildsUrl.openConnection();
-            connection.setRequestProperty("User-Agent", userAgent);
+            connection.setRequestProperty("User-Agent", USER_AGENT);
             connection.setRequestProperty("Accept", "application/json");
             try (final BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
                 final JsonObject json = new Gson().fromJson(reader, JsonObject.class);
