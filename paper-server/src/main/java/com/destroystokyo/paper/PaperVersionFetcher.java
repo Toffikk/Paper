@@ -33,6 +33,7 @@ import java.util.ArrayList;
 
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.format.TextColor.color;
+import static io.papermc.paper.ServerBuildInfo.StringRepresentation.VERSION_SIMPLE;
 
 @DefaultQualifier(NonNull.class)
 public class PaperVersionFetcher implements VersionFetcher {
@@ -138,7 +139,7 @@ public class PaperVersionFetcher implements VersionFetcher {
 
     private static @Nullable String fetchMinecraftVersionList(final ServerBuildInfo build) {
         final String currentVersion = build.minecraftVersionId();
-        final String userAgent = "Paper/" + currentVersion + " (https://papermc.io/)";
+        final String userAgent = build.brandName() + "/" + build.asString(VERSION_SIMPLE) + " (https://papermc.io/)";
 
         try {
             final URL versionsUrl = URI.create("https://fill.papermc.io/v3/projects/paper").toURL();
@@ -194,7 +195,7 @@ public class PaperVersionFetcher implements VersionFetcher {
     }
 
     private static int fetchDistanceFromSiteApi(final ServerBuildInfo build, final int jenkinsBuild) {
-        final String userAgent = "Paper/" + build.minecraftVersionId() + " (https://papermc.io/)";
+        final String userAgent = build.brandName() + "/" + build.asString(VERSION_SIMPLE) + " (https://papermc.io/)";
 
         try {
             final URL buildsUrl = URI.create("https://fill.papermc.io/v3/projects/paper/versions/" + build.minecraftVersionId()).toURL();
