@@ -52,6 +52,7 @@ public class PaperVersionFetcher implements VersionFetcher {
         final Component updateMessage;
         final ServerBuildInfo build = ServerBuildInfo.buildInfo();
         final String userAgent = build.brandName() + "/" + build.asString(VERSION_SIMPLE) + " (https://papermc.io)";
+        System.out.println(userAgent);
 
         if (build.buildNumber().isEmpty() && build.gitCommit().isEmpty()) {
             updateMessage = text("You are running a development version without access to version information", color(0xFF5300));
