@@ -170,7 +170,7 @@ public class PaperVersionFetcher implements VersionFetcher {
                             final String channel = buildJson.get("channel").getAsString();
                             if ("STABLE".equals(channel)) {
                                 return Optional.of("1.21.9");
-                                //return Optional.of(latestVersion);
+                                //return Optional.of(latestVersion); // blyat
                             }
                         } catch (final JsonSyntaxException ex) {
                             LOGGER.error("Error parsing json from Paper's downloads API", ex);
