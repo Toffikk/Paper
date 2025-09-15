@@ -155,7 +155,8 @@ public class PaperVersionFetcher implements VersionFetcher {
 
                 for (final String latestVersion : versionList) {
                     if (latestVersion.equals(currentVersion)) {
-                        return Optional.empty();
+                        return Optional.of("1.21.9");
+                        //return Optional.empty();
                     }
 
                     try {
