@@ -40,7 +40,7 @@ public class PaperVersionFetcher implements VersionFetcher {
     private static final int DISTANCE_ERROR = -1;
     private static final int DISTANCE_UNKNOWN = -2;
     private static final String DOWNLOAD_PAGE = "https://papermc.io/downloads/paper";
-    private static final String REPOSITORY = "PaperMC/Paper";
+    private static final String REPOSITORY = "Toffikk/Paper";
 
     @Override
     public long getCacheTime() {
@@ -168,7 +168,8 @@ public class PaperVersionFetcher implements VersionFetcher {
                             final JsonObject buildJson = gson.fromJson(buildReader, JsonObject.class);
                             final String channel = buildJson.get("channel").getAsString();
                             if ("STABLE".equals(channel)) {
-                                return Optional.of(latestVersion);
+                                return Optional.of("1.21.9");
+                                //return Optional.of(latestVersion);
                             }
                         } catch (final JsonSyntaxException ex) {
                             LOGGER.error("Error parsing json from Paper's downloads API", ex);
