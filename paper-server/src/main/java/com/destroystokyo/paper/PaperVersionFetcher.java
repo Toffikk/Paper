@@ -179,7 +179,7 @@ public class PaperVersionFetcher implements VersionFetcher {
                         LOGGER.error("Error while parsing latest build", e);
                     }
                 }
-            } catch (final JsonSyntaxException ex) {
+            } catch (final JsonSyntaxException ex) { // wahh
                 LOGGER.error("Error parsing json from Paper's downloads API", ex);
             }
         } catch (final IOException e) {
